@@ -30,6 +30,23 @@ async function run() {
       res.send(item);
     });
 
+    //jwt auth
+
+    // app.post("/login", async (req, res) => {
+    //   const user = req.body;
+    //   const accessToken = jwt.sign(user, process.env.TOKEN, {
+    //     expiresIn: "1d",
+    //   });
+    //   res.send({ accessToken });
+    // });
+    // single item api
+    app.get("/item/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const item = await itemCollection.findOne(query);
+      res.send(item);
+    });
+
 
   } finally {
   }
