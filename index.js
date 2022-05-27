@@ -47,6 +47,27 @@ async function run() {
       res.send(item);
     });
 
+    app.put("/item/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      // create a document that sets the plot of the movie
+      const updateDoc = {
+        $set: {
+          ...data,
+        },
+      };
+      const result = await itemCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // add item
+    app.post("/add", async (req, res) => {
+      const data = req.body;
+      const result = await itemCollection.insertOne(data);
+      res.send(result);
+    });
 
   } finally {
   }
