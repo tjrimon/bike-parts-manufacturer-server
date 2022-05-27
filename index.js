@@ -90,7 +90,43 @@ async function run() {
     });
 
 
+    // single item api
+    app.get("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const item = await orderCollection.findOne(query);
+      res.send(item);
+    });
 
+    app.put("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      // create a document that sets the plot of the movie
+      const updateDoc = {
+        $set: {
+          ...data,
+        },
+      };
+      const result = await orderCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // add item
+    app.post("/order/add", async (req, res) => {
+      const data = req.body;
+      const result = await orderCollection.insertOne(data);
+      res.send(result);
+    });
+
+    // delete item
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
   }
 }
