@@ -32,13 +32,13 @@ async function run() {
 
     //jwt auth
 
-    // app.post("/login", async (req, res) => {
-    //   const user = req.body;
-    //   const accessToken = jwt.sign(user, process.env.TOKEN, {
-    //     expiresIn: "1d",
-    //   });
-    //   res.send({ accessToken });
-    // });
+    app.post("/login", async (req, res) => {
+      const user = req.body;
+      const accessToken = jwt.sign(user, process.env.TOKEN, {
+        expiresIn: "1d",
+      });
+      res.send({ accessToken });
+    });
     // single item api
     app.get("/item/:id", async (req, res) => {
       const id = req.params.id;
@@ -68,6 +68,28 @@ async function run() {
       const result = await itemCollection.insertOne(data);
       res.send(result);
     });
+
+    // delete item
+    app.delete("/item/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await itemCollection.deleteOne(query);
+      res.send(result);
+    });
+
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+
+    // all item api
+    app.get("/order", async (req, res) => {
+      const query = {};
+      const cursor = orderCollection.find(query);
+      const item = await cursor.toArray();
+      res.send(item);
+    });
+
+
 
   } finally {
   }
