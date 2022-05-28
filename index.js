@@ -20,8 +20,29 @@ async function run() {
   try {
     await client.connect();
     const itemCollection = client.db("bike-parts").collection("itemCollection");
-    const orderCollection = client.db("order").collection("orderCollection");
+    const orderCollection = client.db("bike-parts").collection("orderCollection");
+    const usersCollection = client.db("bike-parts").collection("usersCollection");
 
+
+    app.put('/user/:email', async (req, res) => {
+      const email = req.params.id;
+      const data = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      // create a document that sets the plot of the movie
+      const updateDoc = {
+        $set: {
+          ...data,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
+
+
+    // ==========================================
+    // ======================================== 
     // all item api
     app.get("/items", async (req, res) => {
       const query = {};
