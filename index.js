@@ -40,6 +40,7 @@ async function run() {
     const orderCollection = client.db("bike-parts").collection("orderCollection");
     const usersCollection = client.db("bike-parts").collection("usersCollection");
     const paymentCollection = client.db("bike-parts").collection("paymentCollection");
+    const reviewCollection = client.db("bike-parts").collection("reviewCollection");
 
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
@@ -223,6 +224,56 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+
+    // all review api
+    app.get("/review", async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const item = await cursor.toArray();
+      res.send(item);
+    });
+
+
+    // single review api
+    app.get("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const item = await reviewCollection.findOne(query);
+      res.send(item);
+    });
+
+    app.put("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      // create a document that sets the plot of the movie
+      const updateDoc = {
+        $set: {
+          ...data,
+        },
+      };
+      const result = await reviewCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    // add review
+    app.post("/review/add", async (req, res) => {
+      const data = req.body;
+      const result = await reviewCollection.insertOne(data);
+      res.send(result);
+    });
+
+    // delete review
+    app.delete("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
