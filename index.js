@@ -97,7 +97,7 @@ async function run() {
       res.send({ admin: isAdmin })
     })
 
-    app.put('/user/admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
+    app.put('/user/admin/:email', verifyJWT, async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const updateDoc = {
