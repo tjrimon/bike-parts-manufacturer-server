@@ -29,6 +29,9 @@ function verifyJWT(req, res, next) {
     next();
   });
 }
+
+
+
 //run function
 async function run() {
   try {
@@ -36,6 +39,7 @@ async function run() {
     const itemCollection = client.db("bike-parts").collection("itemCollection");
     const orderCollection = client.db("bike-parts").collection("orderCollection");
     const usersCollection = client.db("bike-parts").collection("usersCollection");
+    const paymentCollection = client.db("bike-parts").collection("paymentCollection");
 
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
@@ -45,8 +49,34 @@ async function run() {
       }
     }
 
+    //payment 
+    app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+      const service = req.body;
+      const price = service.price;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      });
+      res.send({ clientSecret: paymentIntent.client_secret })
+    });
 
+    app.patch('/order/:id', verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId
+        }
+      }
 
+      const result = await paymentCollection.insertOne(payment);
+      const updatedBooking = await bookingCollection.updateOne(filter, updatedDoc);
+      res.send(updatedBooking);
+    })
     app.put('/user/:email', async (req, res) => {
       const email = req.params.email;
       const user = req.body;
